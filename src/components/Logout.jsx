@@ -11,7 +11,7 @@ const Logout = () => {
     mutationFn: postLogout,
     onSuccess: async () => {
       await queryClient.invalidateQueries(["loggedIn"]);
-      navigate("/login");
+      navigate("/");
     },
     onError: (error) => {
       alert("unexpected error occured");

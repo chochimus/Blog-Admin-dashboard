@@ -43,7 +43,7 @@ const Blogs = () => {
   }
   if (error) {
     if (error.response.status === 403) {
-      navigate("/login");
+      navigate("/");
     }
   }
   //TODO add an edit buton to quickly update published or not

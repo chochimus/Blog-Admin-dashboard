@@ -31,7 +31,7 @@ const App = () => {
     <AuthContext.Provider value={{ loggedIn }}>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route
             path="/blogs"
             element={
