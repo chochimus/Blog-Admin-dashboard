@@ -1,51 +1,64 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  redirect,
-} from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { postLogout } from "./services/logout";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Login from "./components/Login";
 import Blogs from "./components/Blogs";
-import Blog from "./components/Blog";
-import { postLogin } from "./services/login";
+import EditBlog from "./components/EditBlog";
 import { checkLogin } from "./services/checkLogin";
+import CreateBlog from "./components/CreateBlog";
+import AuthContext from "./components/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    checkLogin().then((data) => {
-      setLoggedIn(data.loggedIn);
-    });
-  }, []);
-
-  const postLogoutMutation = useMutation({
-    mutationFn: postLogout,
-    onSuccess: () => {
-      setLoggedIn(false);
-      redirect("/login");
-    },
-    onError: (error) => {
-      alert("unexpected error occured");
-    },
+  const {
+    data: loggedIn,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["loggedIn"],
+    queryFn: checkLogin,
+    onSuccess: (data) => console.log(data),
   });
 
-  const handleLogout = async () => {
-    postLogoutMutation.mutate();
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading login status</div>;
+  }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login setLoggedIn={setLoggedIn} />} />
-        <Route path="/blogs" element={<Blogs loggedIn={loggedIn} />} />
-        <Route path="/blogs/:id" element={<Blog loggedIn={loggedIn} />} />
-      </Routes>
-    </Router>
+    <AuthContext.Provider value={{ loggedIn }}>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/blogs"
+            element={
+              <ProtectedRoute>
+                <Blogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blogs/:id"
+            element={
+              <ProtectedRoute>
+                <EditBlog />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blogs/create"
+            element={
+              <ProtectedRoute>
+                <CreateBlog />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthContext.Provider>
   );
 };
 export default App;

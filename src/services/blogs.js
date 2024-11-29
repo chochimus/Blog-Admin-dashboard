@@ -7,13 +7,20 @@ export const postBlog = async (content) => {
   return response.data;
 };
 
-export const putBlog = async (id, content) => {
-  const response = await axios.put(`${baseUrl}/${id}`, content);
+export const updateBlog = async ({ id, blog }) => {
+  const response = await axios.put(`${baseUrl}/${id}`, blog);
+  return response.data;
+};
+
+export const deleteBlog = async (id) => {
+  const response = await axios.delete(`${baseUrl}/${id}`);
   return response.data;
 };
 
 export const getAll = async () => {
-  const response = await axios.get(baseUrl, { includeUnpublished: true });
+  const response = await axios.get(baseUrl, {
+    params: { includeUnpublished: true },
+  });
   return response.data;
 };
 

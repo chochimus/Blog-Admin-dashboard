@@ -1,38 +1,40 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { postLogin } from "../services/login";
 import { postLogout } from "../services/logout";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
-const Login = ({ setLoggedIn }) => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const onSubmit = (event) => {
     event.preventDefault();
     const credentials = { username, password };
     postLoginMutation.mutate(credentials);
-    setUsername("");
-    setPassword("");
   };
 
   const postLoginMutation = useMutation({
     mutationFn: postLogin,
     onSuccess: async (data) => {
       if (data.role === "ADMIN") {
-        setLoggedIn(true);
+        setUsername("");
+        setPassword("");
+        await queryClient.invalidateQueries(["loggedIn"]);
         navigate("/blogs");
+      } else {
+        postLogout();
+        alert("You are not authorized to log in.");
       }
-      postLogout();
-      alert("You are not authorized to log in.");
     },
     onError: (error) => {
       if (error.response) {
         const { data } = error.response;
 
         if (data.error === "You are already logged in") {
-          setLoggedIn(true);
           navigate("/blogs");
         } else if (data.errors) {
           const validationErrors = data.errors
