@@ -12,7 +12,7 @@ This repository contains the frontend for the admin dashboard portion of the Blo
 
 ## Technologies Used
 
-- **React**: A JavaScript library for building user interfaces.
+- **React**
 - **React Query**
 - **React Router**
 - **Tailwind CSS**
